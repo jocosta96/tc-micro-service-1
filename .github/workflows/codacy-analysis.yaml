@@ -1,4 +1,4 @@
-name: Codacy Analysis CLI
+name: static code analysis
 
 on: ["push"]
 
