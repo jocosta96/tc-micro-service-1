@@ -6,6 +6,10 @@ resource "aws_lambda_function" "authorizer" {
   runtime          = "python3.9"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
+  tracing_config {
+    mode = "Active" # Enable X-Ray tracing
+  }
+
   environment {
     variables = {
       TOKEN = aws_ssm_parameter.valid_token_ssm.value
@@ -20,6 +24,10 @@ resource "aws_lambda_function" "router" {
   handler          = "router.lambda_handler"
   runtime          = "python3.9"
   source_code_hash = data.archive_file.router_zip.output_base64sha256
+
+  tracing_config {
+    mode = "Active" # Enable X-Ray tracing
+  }
 
   environment {
     variables = {
