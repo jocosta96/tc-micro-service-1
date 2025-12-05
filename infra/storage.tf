@@ -5,11 +5,11 @@ locals {
 }
 
 resource "aws_s3_bucket" "backend_bucket" {
-  bucket = "ordering"
+  bucket = "ordering-system-terraform"
 
   tags = merge(
     local.default_tags,
     local.storage_tags,
-    {"name": "ordering"}
+    {"name": "ordering-system-terraform"}
   )
 }
