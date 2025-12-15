@@ -1,0 +1,29 @@
+[tool.ruff]
+# Enable preview mode to opt-in to the latest unstable features and rules.
+preview = true
+# Set the desired Python version for compatibility checks.
+target-version = "py312"
+# Exclude files or directories from linting/formatting.
+exclude = [
+    "dev",
+    ".venv",
+]
+# Set the line length (default is 88).
+line-length = 88
+
+# Specific linting rules configuration
+[tool.ruff.lint]
+# Select the rule codes or families to enable. "E" and "F" are enabled by default.
+select = ["E", "F", "B", "I"] # Example: enables error, flakes, bug-bear, and import sort rules
+# Ignore specific rules globally.
+ignore = ["E501"] # Example: ignores line-too-long rule
+# Per-file overrides
+# [tool.ruff.lint.overrides]
+#   "src/old_code/*.py" = { ignore = ["..."] }
+
+# Specific formatting rules configuration
+[tool.ruff.format]
+# Use single quotes for strings (default is double quotes).
+#quote-style = "single"
+# Use a specific indentation style (only "space" is supported currently).
+#indent-style = "space"
