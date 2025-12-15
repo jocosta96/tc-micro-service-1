@@ -10,11 +10,13 @@ data "aws_region" "current" {}
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/scripts/lambda_authorizer.py"
-  output_path = "${path.module}/scripts/lambda_authorizer.zip"
+  output_path = "${path.module}/lambda_authorizer.zip"
 }
 
 data "archive_file" "router_zip" {
   type        = "zip"
   source_file = "${path.module}/scripts/router.py"
-  output_path = "${path.module}/scripts/router.zip"
+  output_path = "${path.module}/router.zip"
 }
+
+/* S3 monitor lambda removed; using SQS notifications instead. */

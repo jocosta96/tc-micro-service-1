@@ -17,7 +17,7 @@ resource "aws_subnet" "ordering_subnet" {
   vpc_id                  = aws_vpc.ordering_vpc.id
   cidr_block              = cidrsubnet(local.vpc_cidr_block, 4, count.index)
   map_public_ip_on_launch = false
-  availability_zone       = local.availability_zones[count.index]0
+  availability_zone       = local.availability_zones[count.index]
 
   tags                    = merge(local.default_tags, local.network_tags)
 }
