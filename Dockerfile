@@ -3,6 +3,8 @@ FROM python:3.11.12-alpine3.21 AS builder
 
 WORKDIR /code
 
+USER docker
+
 COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt \
