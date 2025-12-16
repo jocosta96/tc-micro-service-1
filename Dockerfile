@@ -3,8 +3,6 @@ FROM python:3.11.12-alpine3.21 AS builder
 
 WORKDIR /code
 
-USER docker
-
 COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt \
@@ -12,6 +10,9 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt \
 
 # Stage 2: Runtime
 FROM python:3.11.12-alpine3.21
+
+# Create non-root user
+RUN addgroup -g 1000 appuser && adduser -D -u 1000 -G appuser appuser
 
 WORKDIR /code
 
@@ -30,9 +31,14 @@ COPY ./src /code/src
 # Copy the infra scripts directory
 #COPY ./infra/scripts /code/infra/scripts
 
+# Set proper permissions for appuser
+RUN chown -R appuser:appuser /code
+
 # Set environment variables for Clean Architecture
 ENV PYTHONPATH=/code
 ENV PYTHONUNBUFFERED=1
+
+USER appuser
 
 # Expose port
 EXPOSE 8080
