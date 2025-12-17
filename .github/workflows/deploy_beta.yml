@@ -10,14 +10,12 @@ permissions:
 env:
   DOCKER_REGISTRY: docker.io
   DOCKER_IMAGE: jocosta96/catalog-microservice
-  IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
   TAG_NAME: ${{ github.actor }}
 
 jobs:
   build-and-push:
     # Only run for PRs coming from branches in this repository (not forks),
     # so secrets like DOCKER_PAT are available. For forked PRs, the job is skipped.
-    if: ${{ IS_FORK == false }}
     runs-on: ubuntu-latest
 
     steps:
