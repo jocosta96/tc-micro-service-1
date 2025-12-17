@@ -62,13 +62,3 @@ jobs:
         echo "📦 Next Steps:"
         echo "   - Team can pull with: docker pull ${{ steps.set-tag.outputs.full-image }}"
         echo "   - Use this image for testing in ephemeral environments"
-
-  skip-notice:
-    # A simple job to surface a clear log when the PR is from a fork.
-    if: ${{ github.event.pull_request.head.repo.fork == true }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: PR from fork - skipping beta build
-        run: |
-          echo "⚠️ This PR is from a fork. Workflow will not push images because secrets are unavailable."
-          echo "If you want to allow forked PRs to trigger protected actions, consider using 'pull_request_target' with strict checks (use with caution)."
