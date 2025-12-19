@@ -21,7 +21,6 @@ from src.application.exceptions import (
     ProductAlreadyExistsException,
     ProductBusinessRuleException,
     ProductValidationException,
-    AuthenticationException,
 )
 from src.adapters.presenters.interfaces.presenter_interface import PresenterInterface
 
