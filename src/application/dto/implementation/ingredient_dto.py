@@ -78,7 +78,7 @@ class IngredientResponse(ResponseInterface):
             name=ingredient.name.value,
             price=float(ingredient.price.amount),
             is_active=ingredient.is_active,
-            type=ingredient.type,
+            type=ingredient.ingredient_type,
             applies_to_burger=ingredient.applies_to_burger,
             applies_to_side=ingredient.applies_to_side,
             applies_to_drink=ingredient.applies_to_drink,

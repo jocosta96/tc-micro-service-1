@@ -34,7 +34,7 @@ class Ingredient:
     name: Name
     price: Money
     is_active: bool
-    type: IngredientType
+    ingredient_type: IngredientType
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
@@ -108,21 +108,19 @@ class Ingredient:
         name: str,
         price: Money,
         is_active: bool,
-        type: IngredientType,
+        ingredient_type: IngredientType,
         applies_to_burger: bool,
         applies_to_side: bool,
         applies_to_drink: bool,
         applies_to_dessert: bool,
-
         internal_id: Optional[int] = None
     ) -> "Ingredient":
-
         """Factory method to create an Ingredient"""
         return cls(
             name=Name.create(name),
             price=price,
             is_active=is_active,
-            type=type,
+            ingredient_type=ingredient_type,
             applies_to_burger=applies_to_burger,
             applies_to_side=applies_to_side,
             applies_to_drink=applies_to_drink,
