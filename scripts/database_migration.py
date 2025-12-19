@@ -36,7 +36,7 @@ def run_alembic_command(command):
         print(f"Working directory: {os.getcwd()}")
         print(f"ALEMBIC_CONFIG: {os.environ.get('ALEMBIC_CONFIG', 'Not set')}")
         
-        result = subprocess.run(
+        result = subprocess.run(["alembic"] + list(map(shlex.quote, command)), capture_output=True, text=True, check=True, env=os.environ.copy())
             ["alembic"] + command,
             capture_output=True,
             text=True,
