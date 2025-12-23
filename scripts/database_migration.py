@@ -36,6 +36,14 @@ def run_alembic_command(command):
         print(f"Working directory: {os.getcwd()}")
         print(f"ALEMBIC_CONFIG: {os.environ.get('ALEMBIC_CONFIG', 'Not set')}")
         
+        allowed_commands = [
+            ["current"],
+            ["revision", "--autogenerate", "-m", "Initial migration"],
+            ["upgrade", "head"],
+            ["history"]
+        ]
+
+        command = command if command in allowed_commands else []
         result = subprocess.run(
             ["alembic"] + list(map(shlex.quote, command)), 
             capture_output=True, 
