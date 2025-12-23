@@ -1,6 +1,8 @@
 import os
 import logging
 
+from botocore.exceptions import BotoCoreError, ClientError
+
 logger = logging.getLogger(__name__)
 
 
@@ -149,7 +151,7 @@ class DatabaseConfig:
                 health["ssm_available"] = self._ssm_client.health_check()
                 if health["ssm_available"]:
                     health["configuration_source"] = "ssm_parameter_store"
-            except Exception:
+            except (BotoCoreError, ClientError, AttributeError):
                 pass
         
         return health
