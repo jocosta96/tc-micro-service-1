@@ -31,8 +31,9 @@ def verify_database_tables():
         
         try:
             # Force re-initialization
-            subprocess.run([sys.executable, 'infra/scripts/database_migration.py', 'init'], check=True)
-            subprocess.run([sys.executable, 'infra/scripts/init_db.py', '--sample-data'], check=True)
+            # Safe: All arguments are static and passed as a list, not a string
+            subprocess.run([sys.executable, 'infra/scripts/database_migration.py', 'init'], check=True, shell=False)
+            subprocess.run([sys.executable, 'infra/scripts/init_db.py', '--sample-data'], check=True, shell=False)
             print("Database re-initialization completed")
             return True
         except subprocess.CalledProcessError as e:
@@ -55,7 +56,8 @@ def force_initial_migration():
         
         if not versions_dir.exists() or not list(versions_dir.glob("*.py")):
             print("No migration files found. Creating initial migration...")
-            subprocess.run([sys.executable, 'infra/scripts/database_migration.py', 'init'], check=True)
+            # Safe: All arguments are static and passed as a list, not a string
+            subprocess.run([sys.executable, 'infra/scripts/database_migration.py', 'init'], check=True, shell=False)
             return True
         else:
             print("Migration files exist")
