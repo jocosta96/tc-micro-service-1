@@ -70,9 +70,7 @@ class SSMParameterStore:
             aws_access_key_id: AWS access key ID
             aws_secret_access_key: AWS secret access key
             aws_session_token: AWS session token (optional, required for temporary credentials)
-        """
-        global _aws_credentials
-        
+        """        
         _aws_credentials['aws_access_key_id'] = aws_access_key_id
         _aws_credentials['aws_secret_access_key'] = aws_secret_access_key
         _aws_credentials['aws_session_token'] = aws_session_token
