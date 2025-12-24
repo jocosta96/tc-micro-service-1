@@ -32,8 +32,8 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_type(self, type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
-        """Find ingredients by type"""
+    def find_by_ingredient_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
+        """Find ingredients by ingredient_type"""
         pass
 
     @abstractmethod
@@ -61,6 +61,6 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def exists_by_type(self, type: IngredientType, include_inactive: bool = False) -> bool:
-        """Check if an ingredient exists with the given type"""
+    def exists_by_ingredient_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
+        """Check if an ingredient exists with the given ingredient_type"""
         pass

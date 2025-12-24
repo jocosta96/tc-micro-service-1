@@ -11,7 +11,7 @@ class IngredientCreateRequest(RequestInterface):
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    ingredient_type: IngredientType
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
@@ -22,7 +22,7 @@ class IngredientCreateRequest(RequestInterface):
             "name": self.name,
             "price": self.price,
             "is_active": self.is_active,
-            "type": self.type,
+            "ingredient_type": self.ingredient_type,
             "applies_to_burger": self.applies_to_burger,
             "applies_to_side": self.applies_to_side,
             "applies_to_drink": self.applies_to_drink,
@@ -37,7 +37,7 @@ class IngredientUpdateRequest(RequestInterface):
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    ingredient_type: IngredientType
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
@@ -49,7 +49,7 @@ class IngredientUpdateRequest(RequestInterface):
             "name": self.name,
             "price": self.price,
             "is_active": self.is_active,
-            "type": self.type,
+            "ingredient_type": self.ingredient_type,
             "applies_to_burger": self.applies_to_burger,
             "applies_to_side": self.applies_to_side,
             "applies_to_drink": self.applies_to_drink,
@@ -64,7 +64,7 @@ class IngredientResponse(ResponseInterface):
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    ingredient_type: IngredientType
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
@@ -78,7 +78,7 @@ class IngredientResponse(ResponseInterface):
             name=ingredient.name.value,
             price=float(ingredient.price.amount),
             is_active=ingredient.is_active,
-            type=ingredient.ingredient_type,
+            ingredient_type=ingredient.ingredient_type,
             applies_to_burger=ingredient.applies_to_burger,
             applies_to_side=ingredient.applies_to_side,
             applies_to_drink=ingredient.applies_to_drink,
@@ -91,7 +91,7 @@ class IngredientResponse(ResponseInterface):
             "name": self.name,
             "price": self.price,
             "is_active": self.is_active,
-            "type": self.type,
+            "ingredient_type": self.ingredient_type,
             "applies_to_burger": self.applies_to_burger,
             "applies_to_side": self.applies_to_side,
             "applies_to_drink": self.applies_to_drink,

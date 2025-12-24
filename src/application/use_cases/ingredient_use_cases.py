@@ -27,14 +27,14 @@ class IngredientCreateUseCase:
     def execute(self, request: IngredientCreateRequest) -> IngredientResponse:
         """Execute the create ingredient use case"""
         self.logger.info(
-            "Creating new ingredient", name=request.name, type=request.type
+            "Creating new ingredient", name=request.name, ingredient_type=request.ingredient_type
         )
 
         ingredient = Ingredient.create(
             name=request.name,
             price=Money(amount=Decimal(str(request.price))),
             is_active=request.is_active,
-                ingredient_type=request.type,
+                ingredient_type=request.ingredient_type,
             applies_to_burger=request.applies_to_burger,
             applies_to_side=request.applies_to_side,
             applies_to_drink=request.applies_to_drink,
@@ -91,14 +91,14 @@ class IngredientUpdateUseCase:
             "Updating ingredient",
             ingredient_id=request.internal_id,
             name=request.name,
-            type=request.type,
+            ingredient_type=request.ingredient_type,
         )
 
         ingredient = Ingredient.create(
             name=request.name,
             price=Money(amount=Decimal(str(request.price))),
             is_active=request.is_active,
-                ingredient_type=request.type,
+                ingredient_type=request.ingredient_type,
             applies_to_burger=request.applies_to_burger,
             applies_to_side=request.applies_to_side,
             applies_to_drink=request.applies_to_drink,

@@ -56,7 +56,7 @@ class Ingredient:
             raise ValueError("Ingredient must have a price")
 
         # Rule: Ingredient must have a type
-        if not self.type:
+            if not self.ingredient_type:
             raise ValueError("Ingredient must have a type")
         
         # Rule: Ingredient must have an usage
@@ -68,7 +68,7 @@ class Ingredient:
         ):
             raise ValueError("Ingredient must have an applies_to")
 
-        if self.applies_to_burger and self.type not in [
+        if self.applies_to_burger and self.ingredient_type not in [
             IngredientType.BREAD,
             IngredientType.MEAT,
             IngredientType.CHEESE,
@@ -78,20 +78,20 @@ class Ingredient:
         ]:
             raise ValueError("Ingredient must be a valid burger ingredient")
         
-        if self.applies_to_side and self.type not in [
+        if self.applies_to_side and self.ingredient_type not in [
             IngredientType.SALAD,
             IngredientType.SAUCE,
             IngredientType.VEGETABLE,
         ]:
             raise ValueError("Ingredient must be a valid side ingredient")
         
-        if self.applies_to_drink and self.type not in [
+        if self.applies_to_drink and self.ingredient_type not in [
             IngredientType.ICE,
             IngredientType.MILK
         ]:
             raise ValueError("Ingredient must be a valid drink ingredient")
         
-        if self.applies_to_dessert and self.type not in [
+        if self.applies_to_dessert and self.ingredient_type not in [
             IngredientType.TOPPING,
         ]:
             raise ValueError("Ingredient must be a valid dessert ingredient")
