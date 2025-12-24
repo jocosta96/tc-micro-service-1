@@ -45,7 +45,7 @@ def run_alembic_command(command):
 
         safe_command = command if command in allowed_commands else []
         result = subprocess.run(
-            ["alembic"] + list(map(shlex.quote, safe_command)), 
+            ["alembic"] + safe_command,
             capture_output=True, 
             text=True, 
             check=True, 
