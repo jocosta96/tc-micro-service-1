@@ -56,7 +56,7 @@ class IngredientController:
                 name=ingredient_data.get("name", ""),
                 price=ingredient_data.get("price", 0.0),
                 is_active=ingredient_data.get("is_active", True),
-                ingredient_type=ingredient_data.get("type"),
+                ingredient_type=ingredient_data.get("ingredient_type"),
                 applies_to_burger=ingredient_data.get("applies_to_burger", False),
                 applies_to_side=ingredient_data.get("applies_to_side", False),
                 applies_to_drink=ingredient_data.get("applies_to_drink", False),
@@ -93,7 +93,7 @@ class IngredientController:
                 name=ingredient_data.get("name", ""),
                 price=ingredient_data.get("price", 0.0),
                 is_active=ingredient_data.get("is_active", True),
-                ingredient_type=ingredient_data.get("type"),
+                ingredient_type=ingredient_data.get("ingredient_type"),
                 applies_to_burger=ingredient_data.get("applies_to_burger", False),
                 applies_to_side=ingredient_data.get("applies_to_side", False),
                 applies_to_drink=ingredient_data.get("applies_to_drink", False),
@@ -136,10 +136,10 @@ class IngredientController:
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=error_response
             )
 
-    def list_ingredients_by_type(self, type: IngredientType, include_inactive: bool = False) -> dict:
+    def list_ingredients_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> dict:
         """List ingredients by type"""
         try:
-            response = self.list_by_type_use_case.execute(type, include_inactive=include_inactive)
+            response = self.list_by_type_use_case.execute(ingredient_type, include_inactive=include_inactive)
             return self.presenter.present(response)
         except IngredientNotFoundException as e:
             error_response = self.presenter.present_error(e)

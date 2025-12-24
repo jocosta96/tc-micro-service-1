@@ -144,11 +144,11 @@ class SQLIngredientRepository(IngredientRepository):
         finally:
             self.database.close_session(session)
 
-    def find_by_type(self, type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
+    def find_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
         """Find ingredients by type"""
         session = self._get_session()
         try:
-            db_ingredients = self.database.find_all_by_field(session, IngredientModel, "type", type.value)
+            db_ingredients = self.database.find_all_by_field(session, IngredientModel, "type", ingredient_type.value)
             ingredients = [self._to_entity(db_ingredient) for db_ingredient in db_ingredients]
             
             # Filter by active status if not including inactive
@@ -248,11 +248,11 @@ class SQLIngredientRepository(IngredientRepository):
         finally:
             self.database.close_session(session)
 
-    def exists_by_type(self, type: IngredientType, include_inactive: bool = False) -> bool:
+    def exists_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
         """Check if an ingredient exists with the given type"""
         session = self._get_session()
         try:
-            db_ingredients = self.database.find_all_by_field(session, IngredientModel, "type", type.value)
+            db_ingredients = self.database.find_all_by_field(session, IngredientModel, "type", ingredient_type.value)
             if not db_ingredients:
                 return False
                 

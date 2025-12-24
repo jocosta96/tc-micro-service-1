@@ -34,7 +34,7 @@ class IngredientCreateUseCase:
             name=request.name,
             price=Money(amount=Decimal(str(request.price))),
             is_active=request.is_active,
-                ingredient_type=request.ingredient_type,
+            ingredient_type=request.ingredient_type,
             applies_to_burger=request.applies_to_burger,
             applies_to_side=request.applies_to_side,
             applies_to_drink=request.applies_to_drink,
@@ -98,7 +98,7 @@ class IngredientUpdateUseCase:
             name=request.name,
             price=Money(amount=Decimal(str(request.price))),
             is_active=request.is_active,
-                ingredient_type=request.ingredient_type,
+            ingredient_type=request.ingredient_type,
             applies_to_burger=request.applies_to_burger,
             applies_to_side=request.applies_to_side,
             applies_to_drink=request.applies_to_drink,
@@ -172,9 +172,9 @@ class IngredientListByTypeUseCase:
         self.ingredient_repository = ingredient_repository
         self.logger = get_logger("IngredientListByTypeUseCase")
 
-    def execute(self, type: IngredientType, include_inactive: bool = False) -> IngredientListResponse:
+    def execute(self, ingredient_type: IngredientType, include_inactive: bool = False) -> IngredientListResponse:
         """Execute the get ingredient by type use case"""
-        ingredients = self.ingredient_repository.find_by_type(type, include_inactive=include_inactive)
+        ingredients = self.ingredient_repository.find_by_type(ingredient_type, include_inactive=include_inactive)
         ingredient_responses = [
             IngredientResponse.from_entity(ingredient) for ingredient in ingredients
         ]
