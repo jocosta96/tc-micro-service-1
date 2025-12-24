@@ -225,7 +225,6 @@ def set_aws_credentials(aws_access_key_id: str, aws_secret_access_key: str, aws_
     Returns:
         True if credentials were set successfully, False otherwise
     """
-    global _aws_credentials, _ssm_client
     
     try:
         # Update global credentials
