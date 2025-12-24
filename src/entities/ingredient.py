@@ -56,7 +56,7 @@ class Ingredient:
             raise ValueError("Ingredient must have a price")
 
         # Rule: Ingredient must have a type
-            if not self.ingredient_type:
+        if not self.ingredient_type:
             raise ValueError("Ingredient must have a type")
         
         # Rule: Ingredient must have an usage
