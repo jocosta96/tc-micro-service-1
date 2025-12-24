@@ -7,7 +7,6 @@ This script handles database schema migrations using Alembic.
 import os
 import sys
 import subprocess
-import shlex
 from pathlib import Path
 
 # Add the parent directory to Python path for imports
@@ -43,13 +42,15 @@ def run_alembic_command(command):
             ["history"]
         ]
 
+        # Only static, pre-approved commands from allowed_commands are executed, so this is safe.
         safe_command = command if command in allowed_commands else []
         result = subprocess.run(
             ["alembic"] + safe_command,
-            capture_output=True, 
-            text=True, 
-            check=True, 
-            env=os.environ.copy()
+            capture_output=True,
+            text=True,
+            check=True,
+            env=os.environ.copy(),
+            shell=False  # Explicitly disable shell for extra safety
         )
         print(f"Alembic command {' '.join(command)} executed successfully:")
         print(result.stdout)
