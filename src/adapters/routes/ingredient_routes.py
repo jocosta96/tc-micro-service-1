@@ -86,14 +86,14 @@ def list_ingredients(
     return controller.list_ingredients(include_inactive=include_inactive)
 
 
-@ingredient_router.get("/list/type/{type}", response_model=IngredientListResponseModel)
+@ingredient_router.get("/list/type/{ingredient_type}", response_model=IngredientListResponseModel)
 def list_ingredients_by_type(
-    type: IngredientType,
+    ingredient_type: IngredientType,
     controller: Annotated[IngredientController, Depends(get_ingredient_controller)],
     include_inactive: bool = False,
 ) -> dict:
     """List ingredients by type"""
-    return controller.list_ingredients_by_type(type, include_inactive=include_inactive)
+    return controller.list_ingredients_by_type(ingredient_type, include_inactive=include_inactive)
 
 
 @ingredient_router.get("/list/applies-to", response_model=IngredientListResponseModel)
