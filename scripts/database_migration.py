@@ -47,13 +47,14 @@ def run_alembic_command(command):
         if command in allowed_commands:
             # Comando estático, seguro para execução
             # nosec: comando é validado e não recebe input externo
-            result = subprocess.run( # nosec
-                ["alembic"] + command, # nosec
+            # Safe subprocess usage: only static, pre-approved commands are allowed, no user input.
+            result = subprocess.run(
+                ["alembic"] + command,
                 capture_output=True,
                 text=True,
                 check=True,
                 env=os.environ.copy(),
-                shell=False # nosec
+                shell=False
             )  # nosec
             print(f"Alembic command {' '.join(command)} executed successfully:")
             print(result.stdout)
@@ -216,4 +217,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
