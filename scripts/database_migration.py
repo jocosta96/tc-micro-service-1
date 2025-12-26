@@ -5,7 +5,6 @@ This script handles database schema migrations using Alembic.
 """
 
 import os
-import re
 import sys
 import subprocess # nosec
 from pathlib import Path
@@ -39,7 +38,7 @@ def run_alembic_command(command):
         allowed_commands = [
             ["current"],
             ["revision", "--autogenerate", "-m", "Initial migration"],
-            ["revision", "--autogenerate", "-m", "Create new migration"]
+            ["revision", "--autogenerate", "-m", "Create new migration"],
             ["upgrade", "head"],
             ["history"]
         ]
