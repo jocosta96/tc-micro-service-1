@@ -33,7 +33,7 @@ def verify_database_tables():
             # Force re-initialization
             # Safe: All arguments are static and passed as a list, not a string
             subprocess.run(['python', 'infra/scripts/database_migration.py', 'init'], check=True, shell=False) # nosec
-            subprocess.run(['python', 'infra/scripts/init_db.py', '--sample-data'], check=True, shell=False)
+            subprocess.run(['python', 'infra/scripts/init_db.py', '--sample-data'], check=True, shell=False) # nosec
             print("Database re-initialization completed")
             return True
         except subprocess.CalledProcessError as e:
