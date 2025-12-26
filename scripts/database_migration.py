@@ -5,6 +5,7 @@ This script handles database schema migrations using Alembic.
 """
 
 import os
+import re
 import sys
 import subprocess # nosec
 from pathlib import Path
@@ -161,13 +162,17 @@ def init_database():
 
 
 def create_migration(message):
-    """Create a new migration"""
+    """Create a new migration"""    
     print(f"Creating new migration: {message}")
-    
+    # Permite apenas letras, números, espaço, hífen e sublinhado na mensagem
+    if not re.match(r'^[\w\s\-]+$', message):
+        print("Migration message contains unsafe characters. Only letters, numbers, spaces, hyphens, and underscores are allowed.")
+        return False
+    # Mensagem validada, seguro para passar ao subprocess
+    # nosec: message is strictly validated above
     if not run_alembic_command(["revision", "--autogenerate", "-m", message]):
         print("Failed to create migration")
         return False
-    
     print("Migration created successfully!")
     return True
 
