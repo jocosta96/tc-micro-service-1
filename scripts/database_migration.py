@@ -21,20 +21,20 @@ def run_alembic_command(command):
         # Change to the project root directory
         project_root = Path(__file__).parent.parent.parent
         os.chdir(project_root)
-        
+
         # Set Alembic config path if not already set
         if 'ALEMBIC_CONFIG' not in os.environ:
             os.environ['ALEMBIC_CONFIG'] = str(project_root / 'alembic.ini')
-        
+
         # Check if we're running in Kubernetes with persistent volume
         if Path("/migrations").exists():
             print("Running in Kubernetes environment with persistent volume")
-        
-        # Run the Alembic command
+
         print(f"Running Alembic command: {' '.join(command)}")
         print(f"Working directory: {os.getcwd()}")
         print(f"ALEMBIC_CONFIG: {os.environ.get('ALEMBIC_CONFIG', 'Not set')}")
-        
+
+        # Lista de comandos permitidos (apenas estáticos, sem input do usuário)
         allowed_commands = [
             ["current"],
             ["revision", "--autogenerate", "-m", "Initial migration"],
@@ -42,19 +42,24 @@ def run_alembic_command(command):
             ["history"]
         ]
 
-        # Only static, pre-approved commands from allowed_commands are executed, so this is safe.
-        safe_command = command if command in allowed_commands else []
-        result = subprocess.run( # nosec
-            ["alembic"] + safe_command, # nosec
-            capture_output=True,
-            text=True,
-            check=True,
-            env=os.environ.copy(),
-            shell=False  # Explicitly disable shell for extra safety
-        ) # nosec
-        print(f"Alembic command {' '.join(command)} executed successfully:")
-        print(result.stdout)
-        return True
+        # Só executa comandos 100% estáticos
+        if command in allowed_commands:
+            # Comando estático, seguro para execução
+            # nosec: comando é validado e não recebe input externo
+            result = subprocess.run(
+                ["alembic"] + command,
+                capture_output=True,
+                text=True,
+                check=True,
+                env=os.environ.copy(),
+                shell=False
+            )  # nosec
+            print(f"Alembic command {' '.join(command)} executed successfully:")
+            print(result.stdout)
+            return True
+        else:
+            print("Rejected alembic command: only static, pre-approved commands are allowed.")
+            return False
     except subprocess.CalledProcessError as e:
         print(f"Error running Alembic command {' '.join(command)}:")
         print(f"Return code: {e.returncode}")
