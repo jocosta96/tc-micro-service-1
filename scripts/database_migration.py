@@ -39,6 +39,7 @@ def run_alembic_command(command):
         allowed_commands = [
             ["current"],
             ["revision", "--autogenerate", "-m", "Initial migration"],
+            ["revision", "--autogenerate", "-m", "Create new migration"]
             ["upgrade", "head"],
             ["history"]
         ]
@@ -161,20 +162,9 @@ def init_database():
     return True
 
 
-def create_migration(message):
+def create_migration():
     """Create a new migration"""    
-    print(f"Creating new migration: {message}")
-    # Permite apenas letras, números, espaço, hífen e sublinhado na mensagem
-    if not re.match(r'^[\w\s\-]+$', message):
-        print("Migration message contains unsafe characters. Only letters, numbers, spaces, hyphens, and underscores are allowed.")
-        return False
-    # Mensagem validada, seguro para passar ao subprocess
-    # nosec: message is strictly validated above
-    if message != "Create new migration":
-        print(f"Migration message: {message} is not allowed.")
-        print("Only 'Create new migration' is allowed for this example.")
-        return False
-    if not run_alembic_command(["revision", "--autogenerate", "-m", message]):
+    if not run_alembic_command(["revision", "--autogenerate", "-m", "Create new migration"]):
         print("Failed to create migration")
         return False
     print("Migration created successfully!")
@@ -218,12 +208,7 @@ def main():
     elif command == "migrate":
         apply_migrations()
     elif command == "create":
-        if len(sys.argv) < 3:
-            print("Error: Migration message required")
-            print("Usage: python database_migration.py create <message>")
-            return
-        message = sys.argv[2]
-        create_migration(message)
+        create_migration()
     elif command == "status":
         show_migration_status()
     else:
