@@ -44,8 +44,8 @@ def run_alembic_command(command):
 
         # Only static, pre-approved commands from allowed_commands are executed, so this is safe.
         safe_command = command if command in allowed_commands else []
-        result = subprocess.run(
-            ["alembic"] + safe_command,
+        result = subprocess.run( # nosec
+            ["alembic"] + safe_command, # nosec
             capture_output=True,
             text=True,
             check=True,
