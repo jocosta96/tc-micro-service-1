@@ -55,7 +55,7 @@ def run_alembic_command(command):
                 check=True,
                 env=os.environ.copy(),
                 shell=False
-            )  # nosec
+            )  # nosec # noqa: B603,B607
             print(f"Alembic command {' '.join(command)} executed successfully:")
             print(result.stdout)
             return True
