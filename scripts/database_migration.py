@@ -170,6 +170,10 @@ def create_migration(message):
         return False
     # Mensagem validada, seguro para passar ao subprocess
     # nosec: message is strictly validated above
+    if message != "Create new migration":
+        print(f"Migration message: {message} is not allowed.")
+        print("Only 'Create new migration' is allowed for this example.")
+        return False
     if not run_alembic_command(["revision", "--autogenerate", "-m", message]):
         print("Failed to create migration")
         return False
