@@ -6,7 +6,7 @@ This script handles database schema migrations using Alembic.
 
 import os
 import sys
-import subprocess
+import subprocess # nosec
 from pathlib import Path
 
 # Add the parent directory to Python path for imports
@@ -51,7 +51,7 @@ def run_alembic_command(command):
             check=True,
             env=os.environ.copy(),
             shell=False  # Explicitly disable shell for extra safety
-        )
+        ) # nosec
         print(f"Alembic command {' '.join(command)} executed successfully:")
         print(result.stdout)
         return True

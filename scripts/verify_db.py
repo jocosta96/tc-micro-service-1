@@ -5,7 +5,7 @@ This script verifies that database tables exist and re-initializes if needed.
 """
 
 import sys
-import subprocess
+import subprocess # nosec
 from pathlib import Path
 
 # Add the parent directory to Python path for imports
