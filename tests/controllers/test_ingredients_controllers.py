@@ -1,6 +1,9 @@
 import pytest
+
 from src.adapters.controllers.ingredient_controller import IngredientController
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
+from src.entities.value_objects.money import Money
+from src.entities.ingredient import Ingredient, IngredientType
 
 
 # Dummy repository for Ingredient
@@ -65,9 +68,6 @@ def test_get_ingredient(controller):
         'applies_to_drink': False,
         'applies_to_dessert': False
     }
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = repo.save(Ingredient.create(
         name=payload['name'],
         price=Money(amount=payload['price']),
@@ -95,9 +95,6 @@ def test_update_ingredient(controller):
         'applies_to_drink': False,
         'applies_to_dessert': False
     }
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = repo.save(Ingredient.create(
         name=payload['name'],
         price=Money(amount=payload['price']),
@@ -136,9 +133,6 @@ def test_delete_ingredient(controller):
         'applies_to_drink': False,
         'applies_to_dessert': False
     }
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = repo.save(Ingredient.create(
         name=payload['name'],
         price=Money(amount=payload['price']),

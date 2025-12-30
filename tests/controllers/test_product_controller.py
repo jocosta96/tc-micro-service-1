@@ -43,9 +43,6 @@ def controller():
     class DummyIngredientRepo:
         def find_by_id(self, ingredient_internal_id, include_inactive=False):
             # Return a dummy ingredient for any id
-            from src.entities.value_objects.money import Money
-            from src.entities.value_objects.name import Name
-            from src.entities.ingredient import Ingredient, IngredientType
             return Ingredient.create(
                 name='Pão',
                 price=Money(amount=1.0),
@@ -82,11 +79,6 @@ def test_create_product(controller):
 
 def test_get_product(controller):
     ctrl, repo = controller
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.value_objects.sku import SKU
-    from src.entities.product import Product, ProductCategory, ProductReceiptItem
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = Ingredient.create(
         name='Pão',
         price=Money(amount=1.0),

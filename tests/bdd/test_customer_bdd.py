@@ -1,4 +1,5 @@
 import pytest
+
 from pytest_bdd import scenarios, given, when, then
 from src.adapters.controllers.customer_controller import CustomerController
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
