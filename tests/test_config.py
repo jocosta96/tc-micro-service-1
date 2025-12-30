@@ -1,5 +1,5 @@
-from src.config.app_config import app_config, AppConfig
-from src.config.database import db_config, DatabaseConfig
+from src.config.app_config import app_config
+from src.config.database import db_config
 
 def test_app_config_properties():
     assert isinstance(app_config.api_prefix, str)

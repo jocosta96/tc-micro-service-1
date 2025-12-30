@@ -7,11 +7,11 @@ from src.entities.value_objects.email import Email
 from src.entities.value_objects.document import Document
 from src.entities.value_objects.money import Money
 from src.entities.value_objects.sku import SKU
+from src.config.app_config import app_config
 
 # Customer entity
 
 def make_customer(**kwargs):
-    from src.config.app_config import app_config
     is_anonymous = kwargs.get('is_anonymous', False)
     email = kwargs.get('email', None)
     if is_anonymous:
@@ -79,10 +79,6 @@ def test_customer_soft_delete():
 def test_customer_business_rules_exceptions(kwargs, err):
     if kwargs.get('is_anonymous') and 'email' in kwargs:
         # Directly call Customer to bypass factory logic that overwrites email
-        from src.entities.customer import Customer
-        from src.entities.value_objects.name import Name
-        from src.entities.value_objects.email import Email
-        from src.entities.value_objects.document import Document
         with pytest.raises(err):
             Customer(
                 first_name=Name.create('John'),
@@ -155,9 +151,6 @@ def test_product_str_repr():
 def test_product_update():
     p = make_product()
     # For category 'side', ingredient must have applies_to_side=True and a valid type (e.g., BREAD)
-    from src.entities.ingredient import IngredientType, Ingredient
-    from src.entities.value_objects.name import Name
-    from src.entities.value_objects.money import Money
     ingredient = Ingredient.create(
            name='SideIngredient',
            price=Money(amount=2.0),

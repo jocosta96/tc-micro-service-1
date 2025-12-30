@@ -1,7 +1,4 @@
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
-from src.application.dto.implementation.customer_dto import CustomerResponse, CustomerListResponse
-from src.application.dto.implementation.ingredient_dto import IngredientResponse, IngredientListResponse
-from src.application.dto.implementation.product_dto import ProductResponse, ProductListResponse
 from src.application.exceptions import CustomerNotFoundException, CustomerAlreadyExistsException, CustomerValidationException
 from http import HTTPStatus
 
