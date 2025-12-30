@@ -1,8 +1,10 @@
 import pytest
+
+from src.entities.value_objects.money import Money
+from src.entities.product import Product, ProductReceiptItem
+from src.entities.ingredient import Ingredient, IngredientType
 from src.adapters.controllers.product_controller import ProductController
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
-from src.entities.product import Product
-from src.application.dto.implementation.product_dto import ProductCreateRequest, ProductUpdateRequest
 
 class DummyProductRepository:
     def find_by_sku(self, sku, include_inactive=False):
@@ -61,21 +63,6 @@ def controller():
 
 def test_create_product(controller):
     ctrl, repo = controller
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.value_objects.sku import SKU
-    from src.entities.product import Product, ProductCategory, ProductReceiptItem
-    from src.entities.ingredient import Ingredient, IngredientType
-    ingredient = Ingredient.create(
-        name='Pão',
-        price=Money(amount=1.0),
-        is_active=True,
-        ingredient_type=IngredientType.BREAD,
-        applies_to_burger=True,
-        applies_to_side=False,
-        applies_to_drink=False,
-        applies_to_dessert=False
-    )
     # Pass default_ingredient as list of dicts for controller
     default_ingredient = [{
         'ingredient_internal_id': 1,
@@ -127,11 +114,6 @@ def test_get_product(controller):
 
 def test_update_product(controller):
     ctrl, repo = controller
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.value_objects.sku import SKU
-    from src.entities.product import Product, ProductCategory, ProductReceiptItem
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = Ingredient.create(
         name='Pão',
         price=Money(amount=1.0),
@@ -171,11 +153,6 @@ def test_update_product(controller):
 
 def test_delete_product(controller):
     ctrl, repo = controller
-    from src.entities.value_objects.money import Money
-    from src.entities.value_objects.name import Name
-    from src.entities.value_objects.sku import SKU
-    from src.entities.product import Product, ProductCategory, ProductReceiptItem
-    from src.entities.ingredient import Ingredient, IngredientType
     ingredient = Ingredient.create(
         name='Pão',
         price=Money(amount=1.0),

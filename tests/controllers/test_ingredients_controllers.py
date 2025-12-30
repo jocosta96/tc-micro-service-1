@@ -1,9 +1,6 @@
 import pytest
 from src.adapters.controllers.ingredient_controller import IngredientController
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
-from src.entities.ingredient import Ingredient
-from src.entities.value_objects.name import Name
-from src.application.dto.implementation.ingredient_dto import IngredientCreateRequest, IngredientUpdateRequest
 
 
 # Dummy repository for Ingredient

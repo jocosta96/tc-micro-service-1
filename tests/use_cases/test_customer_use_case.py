@@ -2,11 +2,6 @@ import pytest
 from src.application.use_cases.customer_use_cases import CustomerCreateUseCase, CustomerReadUseCase, CustomerUpdateUseCase, CustomerDeleteUseCase
 from src.application.dto.implementation.customer_dto import CustomerCreateRequest, CustomerUpdateRequest
 
-from src.entities.customer import Customer
-from src.entities.value_objects.name import Name
-from src.entities.value_objects.email import Email
-from src.entities.value_objects.document import Document
-
 class DummyCustomerRepository:
     def find_by_document(self, document, include_inactive=False):
         # Simula busca por documento, retorna None para não conflitar
