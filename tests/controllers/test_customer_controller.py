@@ -1,120 +1,225 @@
+from http import HTTPStatus
+from types import SimpleNamespace
+
 import pytest
+from fastapi import HTTPException
+
 from src.adapters.controllers.customer_controller import CustomerController
-from src.adapters.presenters.implementations.json_presenter import JSONPresenter
+from src.adapters.presenters.interfaces.presenter_interface import PresenterInterface
+from src.application.exceptions import (
+    CustomerAlreadyExistsException,
+    CustomerBusinessRuleException,
+    CustomerNotFoundException,
+    CustomerValidationException,
+)
 
-from src.entities.customer import Customer
-from src.entities.value_objects.name import Name
-from src.entities.value_objects.email import Email
-from src.entities.value_objects.document import Document
 
-class DummyCustomerRepository:
+class FakePresenter(PresenterInterface):
     def __init__(self):
-        self._db = {}
-        self._id = 1
-    def save(self, customer):
-        customer.internal_id = self._id
-        self._db[self._id] = customer
-        self._id += 1
-        return customer
-    def find_by_id(self, internal_id, include_inactive=False):
-        return self._db.get(internal_id)
-    def update(self, customer):
-        if customer.internal_id in self._db:
-            self._db[customer.internal_id] = customer
-            return customer
-        raise Exception('Not found')
-    def delete(self, internal_id):
-        if internal_id in self._db:
-            del self._db[internal_id]
-            return True
-        return False
-    def exists_by_document(self, document, include_inactive=False):
-        return False
-    def exists_by_email(self, email, include_inactive=False):
-        return False
+        self.presented = []
+        self.errors = []
 
-def controller():
-    repo = DummyCustomerRepository()
-    presenter = JSONPresenter()
-    return CustomerController(repo, presenter), repo
+    def present(self, data):
+        self.presented.append(data)
+        return {"presented": data}
 
-def test_create_customer_success():
-    ctrl, repo = controller()
-    customer = Customer(
-        internal_id=None,
-        first_name=Name.create('John'),
-        last_name=Name.create('Doe'),
-        email=Email.create('john.doe@example.com'),
-        document=Document.create('52998224725'),
-           is_active=True,
-           is_anonymous=False
+    def present_list(self, data_list):
+        self.presented.append(data_list)
+        return {"presented_list": data_list}
+
+    def present_error(self, error: Exception) -> dict:
+        self.errors.append(error)
+        return {"error": str(error)}
+
+
+class StubUseCase:
+    def __init__(self, result=None, exception: Exception | None = None):
+        self.result = result
+        self.exception = exception
+
+    def execute(self, *args, **kwargs):
+        if self.exception:
+            raise self.exception
+        return self.result
+
+
+@pytest.fixture
+def presenter():
+    return FakePresenter()
+
+
+@pytest.fixture
+def controller(presenter):
+    class Repo:
+        """Minimal repository placeholder for controller wiring."""
+
+    return CustomerController(Repo(), presenter)
+
+
+def test_get_anonymous_customer_success(controller):
+    controller.anonymous_use_case = StubUseCase(result={"id": "anon"})
+
+    response = controller.get_anonymous_customer()
+
+    assert response == {"presented": {"id": "anon"}}
+
+
+def test_get_anonymous_customer_not_found(controller):
+    controller.anonymous_use_case = StubUseCase(
+        exception=CustomerNotFoundException("missing")
     )
-    saved = repo.save(customer)
-    response = ctrl.get_customer(saved.internal_id)
-    assert response['first_name'] == 'John'
-    assert response['last_name'] == 'Doe'
-    assert response['email'] == 'john.doe@example.com'
 
-def test_create_customer_failure():
-    ctrl, _ = controller()
-    data = {}
-    with pytest.raises(Exception):
-        ctrl.create_customer(data)
+    with pytest.raises(HTTPException) as exc:
+        controller.get_anonymous_customer()
 
-def test_get_customer():
-    ctrl, repo = controller()
-    customer = Customer(
-        internal_id=None,
-        first_name=Name.create('Get'),
-        last_name=Name.create('Test'),
-        email=Email.create('get@example.com'),
-        document=Document.create('52998224725'),
-           is_active=True,
-           is_anonymous=False
-    )
-    saved = repo.save(customer)
-    response = ctrl.get_customer(saved.internal_id)
-    assert response['first_name'] == 'Get'
-    assert response['last_name'] == 'Test'
+    assert exc.value.status_code == HTTPStatus.NOT_FOUND
+    assert exc.value.detail["error"] == "missing"
 
-def test_update_customer():
-    ctrl, repo = controller()
-    customer = Customer(
-        internal_id=None,
-        first_name=Name.create('To'),
-        last_name=Name.create('Update'),
-        email=Email.create('update@example.com'),
-        document=Document.create('52998224725'),
-           is_active=True,
-           is_anonymous=False
-    )
-    saved = repo.save(customer)
-    updated_customer = Customer(
-        internal_id=saved.internal_id,
-        first_name=Name.create('Updated'),
-        last_name=Name.create('Name'),
-        email=Email.create('updated@example.com'),
-        document=Document.create('52998224725'),
-           is_active=True,
-           is_anonymous=False
-    )
-    repo.update(updated_customer)
-    response = ctrl.get_customer(saved.internal_id)
-    assert response['first_name'] == 'Updated'
-    assert response['last_name'] == 'Name'
-    assert response['email'] == 'updated@example.com'
 
-def test_delete_customer():
-    ctrl, repo = controller()
-    customer = Customer(
-        internal_id=None,
-        first_name=Name.create('To'),
-        last_name=Name.create('Delete'),
-        email=Email.create('delete@example.com'),
-        document=Document.create('52998224725'),
-           is_active=True,
-           is_anonymous=False
+def test_get_anonymous_customer_business_rule_error(controller):
+    controller.anonymous_use_case = StubUseCase(
+        exception=CustomerBusinessRuleException("rule broken")
     )
-    saved = repo.save(customer)
-    result = repo.delete(saved.internal_id)
-    assert result is True
+
+    with pytest.raises(HTTPException) as exc:
+        controller.get_anonymous_customer()
+
+    assert exc.value.status_code == HTTPStatus.BAD_REQUEST
+    assert exc.value.detail["error"] == "rule broken"
+
+
+def test_get_customer_success(controller):
+    controller.read_use_case = StubUseCase(result=SimpleNamespace(internal_id=1))
+
+    response = controller.get_customer(customer_internal_id=1)
+
+    assert response["presented"].internal_id == 1
+
+
+def test_get_customer_not_found(controller):
+    controller.read_use_case = StubUseCase(
+        exception=CustomerNotFoundException("not here")
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        controller.get_customer(customer_internal_id=42)
+
+    assert exc.value.status_code == HTTPStatus.NOT_FOUND
+    assert exc.value.detail["error"] == "not here"
+
+
+def test_get_customer_unexpected_error(controller):
+    controller.read_use_case = StubUseCase(exception=RuntimeError("boom"))
+
+    with pytest.raises(HTTPException) as exc:
+        controller.get_customer(customer_internal_id=5)
+
+    assert exc.value.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert exc.value.detail["error"] == "boom"
+
+
+def test_create_customer_success(controller):
+    controller.create_use_case = StubUseCase(result={"id": 10})
+
+    response = controller.create_customer(
+        {
+            "first_name": "A",
+            "last_name": "B",
+            "email": "a@b.com",
+            "document": "123",
+        }
+    )
+
+    assert response == {"presented": {"id": 10}}
+
+
+def test_create_customer_bad_request(controller):
+    controller.create_use_case = StubUseCase(
+        exception=CustomerAlreadyExistsException("duplicate")
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        controller.create_customer({})
+
+    assert exc.value.status_code == HTTPStatus.BAD_REQUEST
+    assert exc.value.detail["error"] == "duplicate"
+
+
+def test_update_customer_success(controller):
+    controller.update_use_case = StubUseCase(result={"id": 2, "first_name": "New"})
+
+    response = controller.update_customer(
+        {
+            "internal_id": 2,
+            "first_name": "New",
+            "last_name": "Name",
+            "email": "new@example.com",
+            "document": "doc",
+        }
+    )
+
+    assert response["presented"]["id"] == 2
+    assert response["presented"]["first_name"] == "New"
+
+
+def test_update_customer_validation_error(controller):
+    controller.update_use_case = StubUseCase(
+        exception=CustomerValidationException("invalid")
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        controller.update_customer({"internal_id": 5})
+
+    assert exc.value.status_code == HTTPStatus.BAD_REQUEST
+    assert exc.value.detail["error"] == "invalid"
+
+
+def test_list_customers_success(controller):
+    controller.list_use_case = StubUseCase(result=[{"id": 1}, {"id": 2}])
+
+    response = controller.list_customers(include_inactive=True)
+
+    assert response["presented"] == [{"id": 1}, {"id": 2}]
+
+
+def test_list_customers_business_rule_error(controller):
+    controller.list_use_case = StubUseCase(
+        exception=CustomerBusinessRuleException("blocked")
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        controller.list_customers()
+
+    assert exc.value.status_code == HTTPStatus.BAD_REQUEST
+    assert exc.value.detail["error"] == "blocked"
+
+
+def test_delete_customer_success(controller):
+    controller.delete_use_case = StubUseCase(result=True)
+
+    response = controller.delete_customer(customer_internal_id=9)
+
+    assert response["presented"]["success"] is True
+    assert "soft deleted" in response["presented"]["message"]
+
+
+def test_delete_customer_not_found(controller):
+    controller.delete_use_case = StubUseCase(
+        exception=CustomerNotFoundException("gone")
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        controller.delete_customer(customer_internal_id=99)
+
+    assert exc.value.status_code == HTTPStatus.NOT_FOUND
+    assert exc.value.detail["error"] == "gone"
+
+
+def test_delete_customer_unexpected_error(controller):
+    controller.delete_use_case = StubUseCase(exception=RuntimeError("kaboom"))
+
+    with pytest.raises(HTTPException) as exc:
+        controller.delete_customer(customer_internal_id=7)
+
+    assert exc.value.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert exc.value.detail["error"] == "kaboom"

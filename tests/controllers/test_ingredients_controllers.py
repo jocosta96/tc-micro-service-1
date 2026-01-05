@@ -1,151 +1,251 @@
+from http import HTTPStatus
+
 import pytest
+from fastapi import HTTPException
 
+from src.adapters.controllers import ingredient_controller as ingredient_controller_module
 from src.adapters.controllers.ingredient_controller import IngredientController
-from src.adapters.presenters.implementations.json_presenter import JSONPresenter
-from src.entities.value_objects.money import Money
-from src.entities.ingredient import Ingredient, IngredientType
+from src.adapters.presenters.interfaces.presenter_interface import PresenterInterface
+from src.application.exceptions import (
+    IngredientAlreadyExistsException,
+    IngredientBusinessRuleException,
+    IngredientNotFoundException,
+    IngredientValidationException,
+)
+from src.entities.ingredient import IngredientType
+from src.entities.product import ProductCategory
 
 
-# Dummy repository for Ingredient
-class DummyIngredientRepository:
-    def __init__(self):
-        self._db = {}
-        self._id = 1
-    def save(self, ingredient):
-        ingredient.internal_id = self._id
-        self._db[self._id] = ingredient
-        self._id += 1
-        return ingredient
-    def find_by_id(self, ingredient_internal_id, include_inactive=False):
-        return self._db.get(ingredient_internal_id)
-    def update(self, ingredient):
-        if ingredient.internal_id in self._db:
-            self._db[ingredient.internal_id] = ingredient
-            return ingredient
-        raise Exception('Not found')
-    def delete(self, ingredient_internal_id):
-        if ingredient_internal_id in self._db:
-            del self._db[ingredient_internal_id]
-            return True
-        return False
-    def exists_by_name(self, name, include_inactive=False):
-        return False
+class FakePresenter(PresenterInterface):
+    def present(self, data):
+        return {"presented": data}
+
+    def present_list(self, data_list):
+        return {"presented_list": data_list}
+
+    def present_error(self, error: Exception) -> dict:
+        return {"error": str(error)}
 
 
-# Fixture for controller and repo
-@pytest.fixture(scope='module')
-def controller():
-    repo = DummyIngredientRepository()
-    presenter = JSONPresenter()
-    return IngredientController(repo, presenter), repo
+class StubUseCase:
+    def __init__(self, result=None, exception: Exception | None = None):
+        self.result = result
+        self.exception = exception
+        self.calls = []
 
-def test_create_ingredient(controller):
-    ctrl, repo = controller
-    payload = {
-        'name': 'Sal',
-        'price': 1.0,
-        'is_active': True,
-        'ingredient_type': 'bread',
-        'applies_to_burger': True,
-        'applies_to_side': False,
-        'applies_to_drink': False,
-        'applies_to_dessert': False
-    }
-    response = ctrl.create_ingredient(payload)
-    assert response['name'] == 'Sal'
-    assert response['ingredient_type'] == 'bread'
-    assert response['price'] == 1.0
+    def execute(self, *args, **kwargs):
+        self.calls.append((args, kwargs))
+        if self.exception:
+            raise self.exception
+        return self.result
 
-def test_get_ingredient(controller):
-    ctrl, repo = controller
-    payload = {
-        'name': 'Açúcar',
-        'price': 2.0,
-        'is_active': True,
-        'ingredient_type': 'bread',
-        'applies_to_burger': True,
-        'applies_to_side': False,
-        'applies_to_drink': False,
-        'applies_to_dessert': False
-    }
-    ingredient = repo.save(Ingredient.create(
-        name=payload['name'],
-        price=Money(amount=payload['price']),
-        is_active=payload['is_active'],
-        ingredient_type=IngredientType(payload['ingredient_type']),
-        applies_to_burger=payload['applies_to_burger'],
-        applies_to_side=payload['applies_to_side'],
-        applies_to_drink=payload['applies_to_drink'],
-        applies_to_dessert=payload['applies_to_dessert']
-    ))
-    response = ctrl.get_ingredient(ingredient.internal_id)
-    assert response['name'] == 'Açúcar'
-    assert response['ingredient_type'] == 'bread'
-    assert response['price'] == 2.0
 
-def test_update_ingredient(controller):
-    ctrl, repo = controller
-    payload = {
-        'name': 'Pimenta',
-        'price': 3.0,
-        'is_active': True,
-        'ingredient_type': 'bread',
-        'applies_to_burger': True,
-        'applies_to_side': False,
-        'applies_to_drink': False,
-        'applies_to_dessert': False
-    }
-    ingredient = repo.save(Ingredient.create(
-        name=payload['name'],
-        price=Money(amount=payload['price']),
-        is_active=payload['is_active'],
-        ingredient_type=IngredientType(payload['ingredient_type']),
-        applies_to_burger=payload['applies_to_burger'],
-        applies_to_side=payload['applies_to_side'],
-        applies_to_drink=payload['applies_to_drink'],
-        applies_to_dessert=payload['applies_to_dessert']
-    ))
-    update_payload = {
-        'internal_id': ingredient.internal_id,
-        'name': 'Pimenta-do-reino',
-        'price': 3.5,
-        'is_active': True,
-        'ingredient_type': 'bread',
-        'applies_to_burger': True,
-        'applies_to_side': False,
-        'applies_to_drink': False,
-        'applies_to_dessert': False
-    }
-    response = ctrl.update_ingredient(update_payload)
-    # Accept both 'Pimenta-do-reino' and 'Pimenta-Do-Reino' (title case)
-    assert response['name'].lower() == 'pimenta-do-reino'
-    assert response['price'] == 3.5
+@pytest.fixture
+def presenter():
+    return FakePresenter()
 
-def test_delete_ingredient(controller):
-    ctrl, repo = controller
-    payload = {
-        'name': 'Orégano',
-        'price': 0.5,
-        'is_active': True,
-        'ingredient_type': 'bread',
-        'applies_to_burger': True,
-        'applies_to_side': False,
-        'applies_to_drink': False,
-        'applies_to_dessert': False
-    }
-    ingredient = repo.save(Ingredient.create(
-        name=payload['name'],
-        price=Money(amount=payload['price']),
-        is_active=payload['is_active'],
-        ingredient_type=IngredientType(payload['ingredient_type']),
-        applies_to_burger=payload['applies_to_burger'],
-        applies_to_side=payload['applies_to_side'],
-        applies_to_drink=payload['applies_to_drink'],
-        applies_to_dessert=payload['applies_to_dessert']
-    ))
-    result = ctrl.delete_ingredient(ingredient.internal_id)
-    # Accept presenter dict output or True
-    if isinstance(result, dict) and 'data' in result and 'success' in str(result['data']).lower():
-        assert 'success' in str(result['data']).lower()
-    else:
-        assert result is True
+
+@pytest.fixture
+def controller(presenter):
+    class Repo:
+        """Placeholder repository; actual behavior is stubbed on use cases."""
+
+    return IngredientController(Repo(), presenter)
+
+
+def test_create_ingredient_success(controller):
+    controller.create_use_case = StubUseCase(result={"id": 1})
+
+    response = controller.create_ingredient(
+        {
+            "name": "Salt",
+            "price": 1.0,
+            "is_active": True,
+            "ingredient_type": IngredientType.BREAD,
+            "applies_to_burger": True,
+        }
+    )
+
+    assert response == {"presented": {"id": 1}}
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        IngredientAlreadyExistsException("dup"),
+        IngredientBusinessRuleException("rule"),
+        IngredientValidationException("invalid"),
+    ],
+)
+def test_create_ingredient_bad_request(controller, exc):
+    controller.create_use_case = StubUseCase(exception=exc)
+
+    with pytest.raises(HTTPException) as captured:
+        controller.create_ingredient({})
+
+    assert captured.value.status_code == HTTPStatus.BAD_REQUEST
+    assert captured.value.detail["error"] == str(exc)
+
+
+def test_get_ingredient_success(controller):
+    controller.read_use_case = StubUseCase(result={"id": 5})
+
+    response = controller.get_ingredient(ingredient_internal_id=5, include_inactive=True)
+
+    assert response == {"presented": {"id": 5}}
+    assert controller.read_use_case.calls[-1][1]["include_inactive"] is True
+
+
+def test_get_ingredient_not_found(controller):
+    controller.read_use_case = StubUseCase(
+        exception=IngredientNotFoundException("missing")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.get_ingredient(ingredient_internal_id=99)
+
+    assert captured.value.status_code == HTTPStatus.NOT_FOUND
+    assert captured.value.detail["error"] == "missing"
+
+
+def test_update_ingredient_success(controller):
+    controller.update_use_case = StubUseCase(result={"id": 2, "name": "Updated"})
+
+    response = controller.update_ingredient(
+        {
+            "internal_id": 2,
+            "name": "Updated",
+            "price": 2.5,
+            "ingredient_type": IngredientType.MEAT,
+        }
+    )
+
+    assert response["presented"]["id"] == 2
+    assert response["presented"]["name"] == "Updated"
+
+
+def test_update_ingredient_not_found(controller):
+    controller.update_use_case = StubUseCase(
+        exception=IngredientNotFoundException("gone")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.update_ingredient({"internal_id": 7})
+
+    assert captured.value.status_code == HTTPStatus.NOT_FOUND
+    assert captured.value.detail["error"] == "gone"
+
+
+def test_update_ingredient_bad_request(controller):
+    controller.update_use_case = StubUseCase(
+        exception=IngredientAlreadyExistsException("exists")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.update_ingredient({"internal_id": 8})
+
+    assert captured.value.status_code == HTTPStatus.BAD_REQUEST
+    assert captured.value.detail["error"] == "exists"
+
+
+def test_delete_ingredient_success(controller):
+    controller.delete_use_case = StubUseCase(result=True)
+
+    response = controller.delete_ingredient(ingredient_internal_id=3)
+
+    assert response["presented"]["success"] is True
+    assert "soft deleted" in response["presented"]["message"]
+
+
+def test_delete_ingredient_not_found(controller):
+    controller.delete_use_case = StubUseCase(
+        exception=IngredientNotFoundException("not found")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.delete_ingredient(ingredient_internal_id=11)
+
+    assert captured.value.status_code == HTTPStatus.NOT_FOUND
+    assert captured.value.detail["error"] == "not found"
+
+
+def test_list_ingredients_success(controller):
+    controller.list_use_case = StubUseCase(result=[{"id": 1}, {"id": 2}])
+
+    response = controller.list_ingredients(include_inactive=False)
+
+    assert response["presented"] == [{"id": 1}, {"id": 2}]
+
+
+def test_list_ingredients_internal_error(controller):
+    controller.list_use_case = StubUseCase(exception=RuntimeError("fail"))
+
+    with pytest.raises(HTTPException) as captured:
+        controller.list_ingredients()
+
+    assert captured.value.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert captured.value.detail["error"] == "fail"
+
+
+def test_list_ingredients_by_type_success(controller):
+    controller.list_by_type_use_case = StubUseCase(result=[{"id": 5}])
+
+    response = controller.list_ingredients_by_type(IngredientType.SAUCE, include_inactive=True)
+
+    assert response["presented"] == [{"id": 5}]
+    assert controller.list_by_type_use_case.calls[-1][0][0] == IngredientType.SAUCE
+
+
+def test_list_ingredients_by_type_not_found(controller):
+    controller.list_by_type_use_case = StubUseCase(
+        exception=IngredientNotFoundException("none")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.list_ingredients_by_type(IngredientType.SALAD)
+
+    assert captured.value.status_code == HTTPStatus.NOT_FOUND
+    assert captured.value.detail["error"] == "none"
+
+
+def test_list_ingredients_by_applies_to_success(controller):
+    controller.list_by_applies_to_use_case = StubUseCase(result=[{"id": 9}])
+
+    response = controller.list_ingredients_by_applies_to(ProductCategory.DRINK)
+
+    assert response["presented"] == [{"id": 9}]
+    assert controller.list_by_applies_to_use_case.calls[-1][0][0] == ProductCategory.DRINK
+
+
+def test_list_ingredients_by_applies_to_not_found(controller):
+    controller.list_by_applies_to_use_case = StubUseCase(
+        exception=IngredientNotFoundException("empty")
+    )
+
+    with pytest.raises(HTTPException) as captured:
+        controller.list_ingredients_by_applies_to(ProductCategory.BURGER, include_inactive=True)
+
+    assert captured.value.status_code == HTTPStatus.NOT_FOUND
+    assert captured.value.detail["error"] == "empty"
+    assert controller.list_by_applies_to_use_case.calls[-1][1]["include_inactive"] is True
+
+
+def test_list_ingredient_types_success(controller):
+    result = controller.list_ingredient_types()
+
+    assert result["total_count"] == len(IngredientType)
+    assert {"value": IngredientType.BREAD.value, "name": IngredientType.BREAD.name} in result["ingredient_types"]
+
+
+def test_list_ingredient_types_error(controller, monkeypatch):
+    class BadEnum:
+        def __iter__(self):
+            raise RuntimeError("enum broke")
+
+    monkeypatch.setattr(ingredient_controller_module, "IngredientType", BadEnum())
+
+    with pytest.raises(HTTPException) as captured:
+        controller.list_ingredient_types()
+
+    assert captured.value.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert captured.value.detail["error"] == "enum broke"

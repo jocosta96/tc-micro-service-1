@@ -1,8 +1,4 @@
-Feature: CRUD de Cliente
-  Como usuário da API
-  Quero criar, consultar, atualizar e deletar um cliente
-  Para gerenciar os dados de clientes
-
+Feature: Gestão de cliente
   Scenario: Criar, consultar, atualizar e deletar um cliente
     Given que o payload do cliente é válido
     When eu crio o cliente
