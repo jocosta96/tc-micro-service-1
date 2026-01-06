@@ -2,6 +2,9 @@ import pytest
 from src.entities.ingredient import Ingredient, IngredientType
 from src.entities.value_objects.name import Name
 from src.entities.value_objects.money import Money
+from src.entities.product import Product, ProductCategory, ProductReceiptItem
+from src.entities.value_objects.sku import SKU
+from decimal import Decimal
 
 def test_ingredient_business_rules():
     name = Name.create("Alface")
@@ -45,11 +48,6 @@ def test_ingredient_business_rules():
         applies_to_dessert=False
     )
     assert isinstance(ing2, Ingredient)
-
-from src.entities.product import Product, ProductCategory, ProductReceiptItem
-from src.entities.value_objects.sku import SKU
-from src.entities.ingredient import IngredientType
-from decimal import Decimal
 
 def test_product_business_rules():
     name = Name.create("Pao")

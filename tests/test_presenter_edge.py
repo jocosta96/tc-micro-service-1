@@ -1,4 +1,3 @@
-import pytest
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
 from src.application.exceptions import CustomerNotFoundException
 

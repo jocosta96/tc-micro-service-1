@@ -1,6 +1,5 @@
-import pytest
-from src.config.app_config import app_config, AppConfig
-from src.config.database import db_config, DatabaseConfig
+from src.config.app_config import app_config
+from src.config.database import db_config
 from src.config.aws_ssm import SSMParameterStore, set_aws_credentials, get_aws_credentials_status, clear_aws_credentials, get_ssm_client
 
 def test_app_config_str_and_cors():

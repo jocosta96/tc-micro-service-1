@@ -280,7 +280,7 @@ def test_update_customer_document_belongs_to_another():
     )
     with pytest.raises(CustomerAlreadyExistsException) as exc_info:
         update_use_case.execute(update_data)
-    assert '52998224725' in str(exc_info.value)
+    assert customer1.document in str(exc_info.value)
 
 
 def test_update_customer_email_belongs_to_another():
