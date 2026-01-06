@@ -48,7 +48,7 @@ def run_alembic_command(command):
             # Comando estático, seguro para execução
             # nosec: comando é validado e não recebe input externo
             # Safe subprocess usage: only static, pre-approved commands are allowed, no user input.
-            # codacy-disable-next-line subprocess-shell-true
+            # codacy:disable
             result = subprocess.run(  # nosec B603 B607
                 ["alembic"] + command,
                 capture_output=True,
@@ -57,6 +57,7 @@ def run_alembic_command(command):
                 env=os.environ.copy(),
                 shell=False
             )  # noqa: B603,B607
+            # codacy:enable
             print(f"Alembic command {' '.join(command)} executed successfully:")
             print(result.stdout)
             return True
