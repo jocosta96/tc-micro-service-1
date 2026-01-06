@@ -273,7 +273,7 @@ def test_update_product_sku_belongs_to_another():
     )
     with pytest.raises(ProductAlreadyExistsException) as exc_info:
         update_uc.execute(update_req)
-    assert 'SKU-1111-AAA' in str(exc_info.value)
+    assert product1.sku in str(exc_info.value)
 
 
 # ProductDeleteUseCase - cenários de erro

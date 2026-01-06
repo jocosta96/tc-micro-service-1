@@ -314,7 +314,7 @@ def test_update_customer_email_belongs_to_another():
     )
     with pytest.raises(CustomerAlreadyExistsException) as exc_info:
         update_use_case.execute(update_data)
-    assert 'one@example.com' in str(exc_info.value)
+    assert customer1.email in str(exc_info.value)
 
 
 def test_update_customer_cannot_place_order():

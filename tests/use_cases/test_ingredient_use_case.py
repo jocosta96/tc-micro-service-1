@@ -248,7 +248,7 @@ def test_update_ingredient_name_change_to_existing():
     )
     with pytest.raises(IngredientAlreadyExistsException) as exc_info:
         update_uc.execute(update_req)
-    assert 'Alface' in str(exc_info.value)
+    assert ingredient1.name in str(exc_info.value)
 
 
 def test_update_ingredient_same_name_same_id_success():
