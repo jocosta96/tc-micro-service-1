@@ -1,3 +1,5 @@
+from typing import cast
+
 from src.application.repositories.customer_repository import CustomerRepository
 from src.application.repositories.ingredient_repository import IngredientRepository
 from src.application.repositories.product_repository import ProductRepository
@@ -48,7 +50,7 @@ class Container:
     def ingredient_repository(self) -> IngredientRepository:
         """Get ingredient repository instance"""
         if self._ingredient_repository is None:
-            self._ingredient_repository = SQLIngredientRepository(self.database)
+            self._ingredient_repository = cast(IngredientRepository, SQLIngredientRepository(self.database))
         return self._ingredient_repository
 
     @property
