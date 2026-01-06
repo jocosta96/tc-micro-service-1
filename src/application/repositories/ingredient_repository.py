@@ -61,6 +61,6 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def exists_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
+    def exists_by_ingredient_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
         """Check if an ingredient exists with the given ingredient_type"""
         pass

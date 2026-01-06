@@ -246,18 +246,16 @@ class SQLIngredientRepository(IngredientRepository):
         finally:
             self.database.close_session(session)
 
-    def exists_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
-        """Check if an ingredient exists with the given type"""
+    def exists_by_ingredient_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
+        """Check if an ingredient exists with the given ingredient_type"""
         session = self._get_session()
         try:
             db_ingredients = self.database.find_all_by_field(session, IngredientModel, "type", ingredient_type.value)
             if not db_ingredients:
                 return False
-                
             # Check if any ingredient of this type is active (if not including inactive)
             if not include_inactive:
                 return any(ingredient.is_active for ingredient in db_ingredients)
-                
             return True
         finally:
             self.database.close_session(session)
