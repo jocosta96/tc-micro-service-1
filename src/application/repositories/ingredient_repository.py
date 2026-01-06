@@ -32,7 +32,7 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_ingredient_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
+    def find_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
         """Find ingredients by ingredient_type"""
         pass
 
