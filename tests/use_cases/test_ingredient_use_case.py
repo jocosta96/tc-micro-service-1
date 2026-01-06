@@ -39,7 +39,7 @@ class DummyIngredientRepository:
             return list(self._db.values())
         return [i for i in self._db.values() if i.is_active]
 
-    def find_by_type(self, ingredient_type, include_inactive=False):
+    def find_by_ingredient_type(self, ingredient_type, include_inactive=False):
         ingredients = [i for i in self._db.values() if i.ingredient_type == ingredient_type]
         if not include_inactive:
             ingredients = [i for i in ingredients if i.is_active]

@@ -174,7 +174,7 @@ class IngredientListByTypeUseCase:
 
     def execute(self, ingredient_type: IngredientType, include_inactive: bool = False) -> IngredientListResponse:
         """Execute the get ingredient by type use case"""
-        ingredients = self.ingredient_repository.find_by_type(ingredient_type, include_inactive=include_inactive)
+        ingredients = self.ingredient_repository.find_by_ingredient_type(ingredient_type, include_inactive=include_inactive)
         ingredient_responses = [
             IngredientResponse.from_entity(ingredient) for ingredient in ingredients
         ]
