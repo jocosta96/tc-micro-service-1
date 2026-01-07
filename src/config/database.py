@@ -28,7 +28,7 @@ class DatabaseConfig:
             ssm_prefix: Prefix for SSM parameter names (if None, uses environment variable)
         """
         self.use_ssm = use_ssm and os.getenv("USE_SSM_PARAMETERS", "true").lower() == "true"
-        self.ssm_prefix = ssm_prefix or os.getenv("SSM_PARAMETER_PREFIX", "/fastfood/database/")
+        self.ssm_prefix = ssm_prefix or os.getenv("SSM_PARAMETER_PREFIX", "/ordering-system/catalog/database/")
         
         # Initialize SSM client if needed
         self._ssm_client = None
