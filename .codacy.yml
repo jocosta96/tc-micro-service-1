@@ -2,7 +2,7 @@
 engines:
   bandit:
     exclude_paths:
-      - 'scripts/database_migration.py'
+      - 'infra/scripts/database_migration.py'
 exclude_paths:
   - 'tests/**'
   - '**/__pycache__/**'
