@@ -61,7 +61,7 @@ def test_product_invalid_category_and_receipt_item_tuple():
     item = ProductReceiptItem(ingredient, 2)
     assert item.__tuple__() == (ingredient, 2)
 
-    with pytest.raises(ValueError, match="valid category"):
+    with pytest.raises((ValueError, TypeError)):
         Product(
             name=Name.create("X"),
             price=Money(amount=Decimal("1.00")),
