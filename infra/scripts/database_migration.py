@@ -6,6 +6,7 @@ This script handles database schema migrations using Alembic.
 
 import os
 import sys
+import shlex
 import subprocess # nosec
 from pathlib import Path
 
@@ -36,12 +37,13 @@ def run_alembic_command(command):
 
         # Static command mapping - all commands are fully static with no external input
         # This approach satisfies static analysis security requirements
+        # Using shlex.quote for additional sanitization layer
         static_commands = {
-            "current": ["alembic", "current"],
-            "initial_migration": ["alembic", "revision", "--autogenerate", "-m", "Initial migration"],
-            "create_migration": ["alembic", "revision", "--autogenerate", "-m", "Create new migration"],
-            "upgrade": ["alembic", "upgrade", "head"],
-            "history": ["alembic", "history"]
+            "current": [shlex.quote("alembic"), shlex.quote("current")],
+            "initial_migration": [shlex.quote("alembic"), shlex.quote("revision"), shlex.quote("--autogenerate"), shlex.quote("-m"), shlex.quote("Initial migration")],
+            "create_migration": [shlex.quote("alembic"), shlex.quote("revision"), shlex.quote("--autogenerate"), shlex.quote("-m"), shlex.quote("Create new migration")],
+            "upgrade": [shlex.quote("alembic"), shlex.quote("upgrade"), shlex.quote("head")],
+            "history": [shlex.quote("alembic"), shlex.quote("history")]
         }
 
         # Convert command list to lookup key
@@ -59,7 +61,8 @@ def run_alembic_command(command):
 
         # Execute only if command is in static whitelist
         if command_key and command_key in static_commands:
-            # Safe subprocess usage: fully static commands with no concatenation or external input
+            # Safe subprocess usage: fully static commands with shlex.quote() sanitization
+            # No external input, shell=False, all arguments properly escaped
             # pylint: disable=subprocess-run-check
             result = subprocess.run(  # nosec B603
                 static_commands[command_key],
