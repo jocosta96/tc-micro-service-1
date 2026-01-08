@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from typing_extensions import Annotated
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 from src.adapters.controllers.ingredient_controller import IngredientController
@@ -14,11 +14,14 @@ class IngredientCreateModel(BaseModel):
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    ingredient_type: Annotated[IngredientType, Field(alias='type')]
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
     applies_to_dessert: bool
+
+    class Config:
+        populate_by_name = True
 
 
 class IngredientUpdateModel(BaseModel):
@@ -26,19 +29,24 @@ class IngredientUpdateModel(BaseModel):
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    ingredient_type: Annotated[IngredientType, Field(alias='type')]
     applies_to_burger: bool
     applies_to_side: bool
     applies_to_drink: bool
     applies_to_dessert: bool
 
+    class Config:
+        populate_by_name = True
+
 
 class IngredientResponseModel(BaseModel):
+    model_config = {"populate_by_name": True}
+    
     internal_id: Optional[int]
     name: str
     price: float
     is_active: bool
-    type: IngredientType
+    type: IngredientType = Field(validation_alias='ingredient_type')
 
 
 class IngredientListResponseModel(BaseModel):
