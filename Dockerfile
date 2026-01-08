@@ -20,7 +20,7 @@ COPY --from=builder /code/requirements.lock /code/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 # Copy configuration files
-#COPY ./alembic.ini /code/alembic.ini
+COPY ./alembic.ini /code/alembic.ini
 
 # Copy the Clean Architecture source code
 COPY ./src /code/src
