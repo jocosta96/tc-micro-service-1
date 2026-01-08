@@ -29,7 +29,7 @@ COPY ./src /code/src
 #COPY ./webhook /code/webhook
 
 # Copy the infra scripts directory
-#COPY ./infra/scripts /code/infra/scripts
+COPY ./infra/scripts /code/infra/scripts
 
 # Set proper permissions for appuser
 RUN chown -R appuser:appuser /code
