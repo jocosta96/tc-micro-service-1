@@ -44,7 +44,7 @@ class DatabaseConfig:
         # Load configuration
         self.host = self._get_config_value("host", "POSTGRES_HOST", "localhost")
         self.port = int(self._get_config_value("port", "POSTGRES_PORT", "5432"))
-        self.database = self._get_config_value("database", "POSTGRES_DB", "fastfood")
+        self.database = self._get_config_value("database", "POSTGRES_DB", "ordering_system")
         self.username = self._get_config_value("username", "POSTGRES_USER", "postgres")
         self.password = self._get_config_value("password", "POSTGRES_PASSWORD", "password123")
         self.driver = self._get_config_value("driver", "DRIVER_NAME", "postgresql")

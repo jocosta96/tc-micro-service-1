@@ -97,6 +97,13 @@ def init_database():
     project_root = Path(__file__).parent.parent.parent
     migrations_source = project_root / "src" / "config" / "migrations"
     
+    # Ensure versions directory exists (required for migration file generation)
+    versions_dir = migrations_source / "versions"
+    if not versions_dir.exists():
+        print(f"Creating versions directory at {versions_dir}...")
+        versions_dir.mkdir(parents=True, exist_ok=True)
+        print("Versions directory created successfully")
+    
     # If we're running in Kubernetes, copy migration files to persistent volume
     if Path("/migrations").exists():
         import shutil
