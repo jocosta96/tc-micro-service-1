@@ -15,6 +15,7 @@ env:
   EKS_CLUSTER_NAME: catalog-eks-cluster
   DOCKER_REGISTRY: docker.io
   DOCKER_IMAGE: jocosta96/catalog-microservice
+  DOCKER_TAG: ${{ var.docker_tag || 'latest' }}
 
 jobs:
   build-and-push:
@@ -39,7 +40,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ env.DOCKER_IMAGE }}:latest
+        tags: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64
