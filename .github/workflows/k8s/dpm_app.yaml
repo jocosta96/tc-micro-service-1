@@ -13,11 +13,25 @@ spec:
       labels:
         app: "dpm-catalog"
     spec:
+      serviceAccountName: "dpm-catalog-sa"
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: app
-          image: "jocosta96/catalog-microservice:latest"
+          image: "jocosta96/catalog-microservice@sha256:latest"
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -66,6 +80,9 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
           command: ["sh", "-c"]
           args:
             - |
@@ -75,5 +92,8 @@ spec:
               python infra/scripts/database_migration.py init
               python infra/scripts/init_db.py --sample-data
               exec uvicorn src.main:app --host 0.0.0.0 --port 8080
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
 
 
