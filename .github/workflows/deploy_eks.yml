@@ -63,9 +63,9 @@ jobs:
     
     - name: Install kubectl
       run: |
-        curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-11-15/bin/linux/amd64/kubectl
-        chmod +x ./kubectl
-        sudo mv ./kubectl /usr/local/bin
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
     
     - name: Update kubeconfig
       run: |
@@ -73,7 +73,7 @@ jobs:
     
     - name: Deploy to EKS
       run: |
-        kubectl replace --force -f .github/workflows/k8s/dpm_app.yaml
+        kubectl apply -f .github/workflows/k8s/dpm_app.yaml
     
     - name: Verify deployment
       run: |
